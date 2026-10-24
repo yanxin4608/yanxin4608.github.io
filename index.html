@@ -16,12 +16,10 @@
 <body>
 
 <header class="bar">
-  <span>Xin Yan</span>
-  <span class="zh-v" lang="zh-CN">严鑫</span>
-  <button class="theme-toggle" type="button" aria-label="Toggle dark mode" data-theme="light">
-    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-  </button>
+  <div class="bar-center">
+    <a class="lang-toggle" href="zh.html" aria-label="中文" lang="zh-CN">中文</a>
+    <button class="theme-toggle" type="button" aria-label="Toggle dark mode" data-theme="light"><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+  </div>
 </header>
 
 <div class="rail" id="rail" aria-hidden="true"></div>
@@ -29,48 +27,70 @@
 <main>
 
   <!-- (1) Introduction -->
-  <section class="intro" data-sec aria-label="Introduction">
-    <div class="gloss" lang="zh-CN">
-      <div class="gloss-line">
-        <span class="w"><span class="h">我</span><span class="p" lang="zh-Latn">wǒ</span><span class="g sc" lang="en">1SG</span></span>
-        <span class="w"><span class="h">研究</span><span class="p" lang="zh-Latn">yánjiū</span><span class="g" lang="en">study</span></span>
-        <span class="w"><span class="h">人们</span><span class="p" lang="zh-Latn">rénmen</span><span class="g" lang="en">person-<span class="sc">PL</span></span></span>
-        <span class="w"><span class="h">如何</span><span class="p" lang="zh-Latn">rúhé</span><span class="g" lang="en">how</span></span>
-        <span class="w hl"><span class="h">学习</span><span class="p" lang="zh-Latn">xuéxí</span><span class="g" lang="en">learn</span></span>
-        <span class="w"><span class="h">语言，</span><span class="p" lang="zh-Latn">yǔyán</span><span class="g" lang="en">language</span></span>
-      </div>
-      <div class="gloss-line">
-        <span class="w"><span class="h">教</span><span class="p" lang="zh-Latn">jiāo</span><span class="g" lang="en">teach</span></span>
-        <span class="w"><span class="h">中文，</span><span class="p" lang="zh-Latn">Zhōngwén</span><span class="g" lang="en">Chinese</span></span>
-      </div>
-      <div class="gloss-line">
-        <span class="w"><span class="h">偶尔</span><span class="p" lang="zh-Latn">ǒu'ěr</span><span class="g" lang="en">sometimes</span></span>
-        <span class="w"><span class="h">拍照。</span><span class="p" lang="zh-Latn">pāizhào</span><span class="g" lang="en">photograph</span></span>
-      </div>
+    <section class="intro" data-sec aria-label="Introduction">
+    <div class="gloss" lang="zh-CN" id="gloss">
+      <span class="w"><span class="h">你好！</span><span class="p" lang="zh-Latn">nǐ hǎo</span><span class="g" lang="en">hello</span></span>
+      <span class="w"><span class="h">我是</span><span class="p" lang="zh-Latn">wǒ shì</span><span class="g" lang="en">1SG be</span></span>
+      <span class="w"><span class="h">严鑫。</span><span class="p" lang="zh-Latn">Yán Xīn</span><span class="g" lang="en">name</span></span>
+      <span class="w"><span class="h">我</span><span class="p" lang="zh-Latn">wǒ</span><span class="g sc" lang="en">1SG</span></span>
+      <span class="w"><span class="h">研究</span><span class="p" lang="zh-Latn">yánjiū</span><span class="g" lang="en">study</span></span>
+      <span class="w"><span class="h">人们</span><span class="p" lang="zh-Latn">rénmen</span><span class="g" lang="en">person-<span class="sc">PL</span></span></span>
+      <span class="w"><span class="h">如何</span><span class="p" lang="zh-Latn">rúhé</span><span class="g" lang="en">how</span></span>
+      <span class="w hl"><span class="h">学习</span><span class="p" lang="zh-Latn">xuéxí</span><span class="g" lang="en">learn</span></span>
+      <span class="w"><span class="h">语言，</span><span class="p" lang="zh-Latn">yǔyán</span><span class="g" lang="en">language</span></span>
+      <span class="w"><span class="h">教</span><span class="p" lang="zh-Latn">jiāo</span><span class="g" lang="en">teach</span></span>
+      <span class="w"><span class="h">中文，</span><span class="p" lang="zh-Latn">Zhōngwén</span><span class="g" lang="en">Chinese</span></span>
+      <span class="w"><span class="h">偶尔</span><span class="p" lang="zh-Latn">ǒu'ěr</span><span class="g" lang="en">sometimes</span></span>
+      <span class="w"><span class="h">拍照。</span><span class="p" lang="zh-Latn">pāizhào</span><span class="g" lang="en">photograph</span></span>
+      <span class="tr-en"><span class="ew">Hello!</span> <span class="ew">I’m</span> <span class="ew">Xin</span> <span class="ew">Yan.</span> <span class="ew">I</span> <span class="ew">study</span> <span class="ew">how</span> <span class="ew">people</span> <span class="ew">learn</span> <span class="ew">languages.</span> <span class="ew">I</span> <span class="ew">teach</span> <span class="ew">Chinese.</span> <span class="ew">And</span> <span class="ew">sometimes</span> <span class="ew">take</span> <span class="ew">photographs.</span></span>
     </div>
-    <p class="translation">
-      <span>I study how people learn languages</span>
-      <span>I teach Chinese</span>
-      <span>and sometimes take photographs</span>
-    </p>
-  </section>
+      <span class="hint">Move your cursor over the words</span>
+</section>
 
   <!-- (2) Who is reading: reorders the sections below -->
-  <section class="stack" data-sec aria-label="Education">
-    <span class="label">Education <span class="zh-v" lang="zh-CN">教育背景</span></span>
-    <div class="item"><span>University of Cambridge — PhD, Linguistics and Language Acquisition</span><span class="meta">2022–present · thesis submitted 2026, degree pending · AHRC (UKRI) full scholarship</span></div>
-    <div class="item"><span>Peking University — MA, Teaching Chinese as a Second Language</span><span class="meta">2019–2022 · GPA 3.8/4.0, ranked 1/31 · National Scholarship, Outstanding Graduate</span></div>
-    <div class="item"><span>Anhui University — BA, Russian Language and Literature</span><span class="meta">2011–2015</span></div>
+    <section class="edu" data-sec aria-label="Education">
+    <span class="label title">Education</span>
+    <figure class="edu-map">
+    
+      <div class="edu-node">
+        <span class="edu-dot"></span>
+        <div class="edu-card">
+          <span class="edu-place">Cambridge · UK · 52°N 0°E</span>
+          <strong>University of Cambridge</strong>
+          <span>PhD, Linguistics and Language Acquisition</span>
+          <span class="meta">2022–present · thesis submitted 2026 · AHRC (UKRI) full scholarship</span>
+        </div>
+      </div>
+      <div class="edu-node">
+        <span class="edu-dot"></span>
+        <div class="edu-card">
+          <span class="edu-place">Beijing · China · 40°N 116°E</span>
+          <strong>Peking University</strong>
+          <span>MA, Teaching Chinese as a Second Language</span>
+          <span class="meta">2019–2022 · GPA 3.8/4.0, ranked 1/31 · National Scholarship, Outstanding Graduate</span>
+        </div>
+      </div>
+      <div class="edu-node">
+        <span class="edu-dot"></span>
+        <div class="edu-card">
+          <span class="edu-place">Anhui · China · 32°N 117°E</span>
+          <strong>Anhui University</strong>
+          <span>BA, Russian Language and Literature</span>
+          <span class="meta">2011–2015</span>
+        </div>
+      </div>
+    </figure>
   </section>
 
   <section class="cloze" data-sec aria-label="Who is reading">
-    <span class="label">Fill in the blank <span class="zh-v" lang="zh-CN">选词填空</span></span>
-    <p class="sentence">I’m reading this as <span class="blank" id="blank">&nbsp;</span>.</p>
+    <span class="label title">Fill in the blank</span>
+    <p class="sentence">I’m reading this as <span class="cursor" aria-hidden="true"></span><span class="blank" id="blank">&nbsp;</span>.</p>
     <div class="options" id="options" role="group" aria-label="Who is reading">
-      <button type="button" data-aud="teaching" data-fill="a teaching recruiter" aria-pressed="false"><span class="letter">a.</span><span class="en">someone hiring for teaching</span><span class="zh" lang="zh-CN">招聘教学岗</span></button>
-      <button type="button" data-aud="research-hire" data-fill="a research recruiter" aria-pressed="false"><span class="letter">b.</span><span class="en">someone hiring for research</span><span class="zh" lang="zh-CN">招聘研究岗</span></button>
-      <button type="button" data-aud="research" data-fill="a fellow researcher" aria-pressed="false"><span class="letter">c.</span><span class="en">a fellow researcher</span><span class="zh" lang="zh-CN">学术同行</span></button>
-      <button type="button" data-aud="browse" data-fill="a curious visitor" aria-pressed="false"><span class="letter">d.</span><span class="en">just a curious visitor</span><span class="zh" lang="zh-CN">随便看看</span></button>
+      <button type="button" data-aud="teaching" data-fill="a teaching recruiter" aria-pressed="false"><span class="letter">a.</span><span class="en">someone hiring for teaching</span></button>
+      <button type="button" data-aud="research-hire" data-fill="a research recruiter" aria-pressed="false"><span class="letter">b.</span><span class="en">someone hiring for research</span></button>
+      <button type="button" data-aud="industry" data-fill="an industry recruiter" aria-pressed="false"><span class="letter">c.</span><span class="en">someone hiring for industry</span></button>
+      <button type="button" data-aud="research" data-fill="a fellow researcher" aria-pressed="false"><span class="letter">d.</span><span class="en">a fellow researcher</span></button>
+      <button type="button" data-aud="browse" data-fill="a curious visitor" aria-pressed="false"><span class="letter">e.</span><span class="en">just a curious visitor</span></button>
     </div>
     <span class="note" id="note" aria-live="polite">Choose one, and the page below will reorder itself.</span>
   </section>
@@ -79,7 +99,7 @@
 
     <section class="split" data-sec data-key="teaching" aria-label="Teaching">
       <div class="stack">
-        <span class="label">Teaching <span class="zh-v" lang="zh-CN">教学</span></span>
+        <span class="label title">Teaching</span>
         <div class="item"><span>Interim Lecturer and Supervisor in Modern Chinese, University of Cambridge</span><span class="meta">2022–2026 · four undergraduate modules and small-group supervisions</span></div>
         <div class="item"><span>Teaching Assistant in Chinese, Peking University (Yenching Academy) · Pre-University Programme</span><span class="meta">2019–2022</span></div>
         <div class="item"><span>Chinese Language Teacher, Kharkiv National University, Ukraine</span><span class="meta">2015–2018 · curricula from beginner to upper-intermediate, HSK preparation, Vice-Rector’s Commendation</span></div>
@@ -98,47 +118,55 @@
     </section>
 
     <section class="stack" style="gap: 10px" data-sec data-key="product" aria-label="Learning products">
-      <span class="label">Learning products <span class="zh-v" lang="zh-CN">学习产品</span></span>
+      <span class="label title">Learning products</span>
       <canvas class="dots" id="dots" aria-hidden="true"></canvas>
-      <span class="label">50,000 dots — one for every ten Readboy learners. Move across them.</span>
+      <span class="label">50,000 dots — one for every ten uses by my Readboy students. Move across them.</span>
       <div class="item"><span>Online Instructor and Course Developer, Readboy Education (HKG: 2385)</span><span class="meta">2019–2022 · read usage data and learner feedback to find content gaps, which shaped new courses</span></div>
     </section>
 
-    <section class="split reverse" data-sec data-key="research" aria-label="Publications and talks">
+    <section class="split" data-sec data-key="research" aria-label="Publications and talks" style="align-items: flex-start">
       <figure class="stack" style="gap: 16px">
-        <blockquote class="quote">Colorless <mark>green</mark> ideas sleep furiously.</blockquote>
+        <blockquote class="quote"><span class="qw colorless">Colorless</span> <span class="qw green">green</span> <span class="qw ideas">ideas</span><span class="qw brk"></span> <span class="qw sleep">sleep</span> <span class="qw furiously">furiously.</span></blockquote>
         <figcaption class="label">Noam Chomsky, <em>Syntactic Structures</em> (1957). Perfectly grammatical, and meaningless.</figcaption>
       </figure>
       <div class="stack">
-        <span class="label">Publications <span class="zh-v" lang="zh-CN">发表</span></span>
+        <span class="label title">Publications</span>
         <div class="item"><span><em>Anchoring Entities and Events in Monolingual, Bidialectal, and Bilingual Speakers’ Mandarin Chinese</em></span><span class="meta">PhD thesis, Cambridge, 2026 · AHRC-funded</span></div>
         <div class="item"><span>Ambiguity resolution of wh-elements by L1-Russian L2-Chinese speakers</span><span class="meta">BUCLD 49 Proceedings, 2025 · <span class="accent">Paula Menyuk Award</span></span></div>
         <div class="item"><span>L1 Russian L2 Chinese speakers’ acquisition of the conjunction <em>hé</em></span><span class="meta">ExLing 2020 Proceedings</span></div>
         <div class="item"><span>A journal article on L2 Chinese ambiguity resolution</span><span class="meta">Under review</span></div>
         <div class="item"><span>Proceedings of GASLA 18, co-editor</span><span class="meta">In preparation</span></div>
-        <span class="label" style="margin-top: 12px">Talks <span class="zh-v" lang="zh-CN">报告</span></span>
-        <div class="item"><span>Conference presentations</span><span class="meta">GASLA 18 (2026) and four international conferences (2020–2025)</span></div>
+        <span class="label title" style="margin-top: 12px">Presentations</span>
+        <div class="item"><span>Referential anchoring in monodialectal and bidialectal Mandarin</span><span class="meta">Poster · GASLA 18, Cambridge, 2026</span></div>
+        <div class="item"><span>Interfaces in ambiguity resolution of wh-elements by L1-Russian L2-Chinese speakers</span><span class="meta">Talk · BUCLD 49, Boston, 2024</span></div>
+        <div class="item"><span>Ambiguity resolution of wh-elements at interfaces in L2 Chinese: prosody and syntax</span><span class="meta">Talk · GALA 16, Lisbon, 2024</span></div>
+        <div class="item"><span>The acquisition of Chinese functional words by Russian speakers: the conjunction <em>hé</em></span><span class="meta">Poster · YLMP 2021, Poznań, 2021</span></div>
+        <div class="item"><span>L1 Russian L2 Chinese speakers’ acquisition of the Chinese conjunction <em>hé</em></span><span class="meta">Talk · ExLing 2020, Athens, 2020</span></div>
+        <div class="item"><span>The occurrence of the auxiliary word <em>zài</em> in Mandarin Chinese</span><span class="meta">Talk · 2nd Conference on Orientalism in Ukraine, Kharkiv, 2018</span></div>
       </div>
     </section>
 
     <section class="bleed" data-sec data-key="photo" aria-label="Photography">
-      <div class="head"><span>Photography</span><a href="photography.html">All photographs →</a><span class="zh-v" lang="zh-CN">摄影</span></div>
+      <div class="head"><span>Photography</span></div>
       <div class="strip">
-        <a href="photography.html"><img src="photos/nice-2023-1200.jpg" srcset="photos/nice-2023-1200.jpg 1200w, photos/nice-2023.jpg 2400w" sizes="80vw" width="1200" height="796" alt="A lone fisherman on a pebble beach, the sea glittering in the sun" loading="lazy"><span class="cap">Nice, France, 2023</span></a>
-        <a href="photography.html"><img src="photos/kharkiv-2017-1200.jpg" srcset="photos/kharkiv-2017-1200.jpg 1200w, photos/kharkiv-2017.jpg 2400w" sizes="90vw" width="1200" height="490" alt="A city square in Kharkiv on a winter night, with a lit Christmas tree" loading="lazy"><span class="cap">Kharkiv, Ukraine, 2017</span></a>
-        <a href="photography.html"><img src="photos/taihu-2016-1200.jpg" srcset="photos/taihu-2016-1200.jpg 1200w, photos/taihu-2016.jpg 2400w" sizes="100vw" width="1200" height="374" alt="Dusk over hills and trees near Taihu" loading="lazy"><span class="cap">Taihu, China, 2016</span></a>
+        <figure><img src="photos/nice-2023-1200.jpg" srcset="photos/nice-2023-1200.jpg 1200w, photos/nice-2023.jpg 2400w" sizes="80vw" width="1200" height="796" alt="A lone fisherman on a pebble beach, the sea glittering in the sun" loading="lazy"><figcaption class="cap">Nice, France, 2023</figcaption></figure>
+        <figure><img src="photos/kharkiv-2017-1200.jpg" srcset="photos/kharkiv-2017-1200.jpg 1200w, photos/kharkiv-2017.jpg 2400w" sizes="90vw" width="1200" height="490" alt="A city square in Kharkiv on a winter night, with a lit Christmas tree" loading="lazy"><figcaption class="cap">Kharkiv, Ukraine, 2017</figcaption></figure>
+        <figure><img src="photos/taihu-2016-1200.jpg" srcset="photos/taihu-2016-1200.jpg 1200w, photos/taihu-2016.jpg 2400w" sizes="100vw" width="1200" height="374" alt="Dusk over hills and trees near Taihu" loading="lazy"><figcaption class="cap">Taihu, China, 2016</figcaption></figure>
       </div>
     </section>
 
   </div>
 
-  <section class="stack" data-sec aria-label="Projects">
-    <span class="label">Projects <span class="zh-v" lang="zh-CN">项目</span></span>
+  <section class="split" data-sec aria-label="Projects">
+    <div class="stack">
+      <span class="label title">Projects</span>
     <div class="item"><span>AI language-learning tools</span><span class="meta">In preparation</span></div>
+    </div>
+    
   </section>
 
   <section class="now" data-sec aria-label="Now">
-    <span class="now-head">Now · October 2026 <span class="zh-v" lang="zh-CN">近况</span></span>
+    <span class="now-head">Now · October 2026</span>
     <div class="lines">
       <span>Thesis submitted.</span>
       <span>Editing the GASLA 18 proceedings.</span>
@@ -163,6 +191,7 @@
     none: ['teaching', 'research', 'product', 'photo'],
     teaching: ['teaching', 'research', 'product', 'photo'],
     'research-hire': ['research', 'teaching', 'product', 'photo'],
+    industry: ['product', 'research', 'teaching', 'photo'],
     research: ['research', 'teaching', 'product', 'photo'],
     browse: ['photo', 'teaching', 'product', 'research']
   };
@@ -344,6 +373,29 @@
       }, function () { window.location.href = 'mailto:' + emailAddr; });
     }
   });
+
+  /* Gloss words dodge the pointer (playful) */
+  var intro = document.querySelector('.intro');
+  if (intro) {
+    var gwords = Array.prototype.slice.call(intro.querySelectorAll('.w, .ew, .gword'));
+    intro.addEventListener('pointermove', function (e) {
+      gwords.forEach(function (w) {
+        var r = w.getBoundingClientRect();
+        var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        var dx = cx - e.clientX, dy = cy - e.clientY;
+        var d = Math.hypot(dx, dy);
+        if (d < 110 && d > 0) {
+          var f = (1 - d / 110) * 70;
+          w.style.transform = 'translate(' + (dx / d * f) + 'px,' + (dy / d * f) + 'px)';
+        } else {
+          w.style.transform = '';
+        }
+      });
+    });
+    intro.addEventListener('pointerleave', function () {
+      gwords.forEach(function (w) { w.style.transform = ''; });
+    });
+  }
 
   apply(null);
 })();
