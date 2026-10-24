@@ -34,3 +34,12 @@
   else if (media.addListener) media.addListener(applyTheme);
   applyTheme();
 })();
+
+/* Splash：点进入关闭 */
+(function () {
+  var btn = document.getElementById('splashEnter');
+  if (btn) btn.addEventListener('click', function () {
+    var splash = document.getElementById('splash');
+    if (splash) splash.setAttribute('hidden', '');
+  });
+})();

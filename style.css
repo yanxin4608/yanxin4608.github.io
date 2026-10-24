@@ -272,3 +272,12 @@ body, .bar, .dots, .w.hl, .quote mark, .blank {
 
 :lang(zh-CN) { font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Heiti SC", "SimHei", "黑体", sans-serif; }
 html:lang(zh-CN) body { font-size: 16px; }
+
+/* Splash：手机进入前提示电脑效果更好 */
+.splash { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 28px; }
+.splash[hidden] { display: none; }
+.splash-box { display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; max-width: 20em; }
+.splash-title { margin: 0; font-size: clamp(18px, 5vw, 24px); line-height: 1.5; color: var(--ink); }
+.splash-enter { min-height: 48px; padding: 0 32px; border-radius: 999px; border: none; background: var(--sage); color: var(--on-accent); font-size: 15px; cursor: pointer; }
+.splash-enter:hover { opacity: 0.85; }
+@media (min-width: 641px) { .splash { display: none; } }
