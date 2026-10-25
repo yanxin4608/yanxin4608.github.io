@@ -174,7 +174,8 @@
   function next(dir) {
     if (cur >= order.length - 1) { layout(); swing(order[cur]); toast('last'); return false; }
     var c = order[cur];
-    if (dir === 'right') c._fall = { x: rand(window.innerWidth * 0.45, window.innerWidth * 0.7), r: rand(22, 34) };
+    if (dir === 'left') c._fall = { x: -rand(window.innerWidth * 0.45, window.innerWidth * 0.7), r: -rand(22, 34) };
+    else if (dir === 'right') c._fall = { x: rand(window.innerWidth * 0.45, window.innerWidth * 0.7), r: rand(22, 34) };
     else c._fall = { x: rand(-60, 60), r: rand(-14, 14) };
     c.classList.add('falling');
     setTimeout(function () { c.classList.remove('falling'); }, 950);
@@ -198,7 +199,7 @@
     if (busy || target === cur) return;
     busy = true;
     var step = function () {
-      var moved = target > cur ? next('down') : prev();
+      var moved = target > cur ? next('left') : prev();
       if (moved && cur !== target) setTimeout(step, 85);
       else setTimeout(function () { busy = false; }, 500);
     };
@@ -253,7 +254,7 @@
   }
 
   if (prevBtn) prevBtn.addEventListener('click', function () { if (!busy) prev(); });
-  if (nextBtn) nextBtn.addEventListener('click', function () { if (!busy) next('down'); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { if (!busy) next('left'); });
 
   /* Floating hint: stays until the visitor presses OK or drops a card; remembered per browser */
   var hint = document.getElementById('deckHint');
@@ -298,7 +299,8 @@
     return false;
   }
 
-  /* Wheel and trackpad: down or right drops the card, up or left brings it back */
+  /* Wheel and trackpad: only sideways swipes turn cards (swipe left = next, swipe right = back).
+     Up and down only scroll inside a card. */
   var acc = 0, lastWheel = 0, quietUntil = 0, needGap = false;
   window.addEventListener('wheel', function (e) {
     if (splashOpen()) return;
@@ -306,20 +308,24 @@
     var d = horizontal ? e.deltaX : e.deltaY;
     var dir = horizontal ? (d > 0 ? 'right' : 'left') : (d > 0 ? 'down' : 'up');
     if (canScroll(e.target, dir)) return;
-    var strip = !horizontal && e.target.closest && e.target.closest('.strip');
-    if (strip && canScroll(strip, d > 0 ? 'right' : 'left')) {
-      // mouse wheel over the photos moves the strip one photo at a time, then the deck takes over
-      e.preventDefault();
-      var tnow = performance.now();
-      if (tnow - (strip._wheelAt || 0) > 450) {
-        strip._wheelAt = tnow;
-        var figs = Array.prototype.slice.call(strip.children);
-        var x = strip.scrollLeft, max = strip.scrollWidth - strip.clientWidth, target = null;
-        if (d > 0) target = figs.filter(function (f) { return f.offsetLeft - strip.offsetLeft > x + 4; })[0];
-        else target = figs.filter(function (f) { return f.offsetLeft - strip.offsetLeft < x - 4; }).pop();
-        var left = target ? Math.min(max, target.offsetLeft - strip.offsetLeft) : (d > 0 ? max : 0);
-        strip.scrollTo({ left: left, behavior: reduce ? 'auto' : 'smooth' });
+    if (!horizontal) {
+      var strip = e.target.closest && e.target.closest('.strip');
+      if (strip && canScroll(strip, d > 0 ? 'right' : 'left')) {
+        // a mouse wheel over the photos moves the strip one photo at a time
+        e.preventDefault();
+        var tnow = performance.now();
+        if (tnow - (strip._wheelAt || 0) > 450) {
+          strip._wheelAt = tnow;
+          var figs = Array.prototype.slice.call(strip.children);
+          var x = strip.scrollLeft, max = strip.scrollWidth - strip.clientWidth, target = null;
+          if (d > 0) target = figs.filter(function (f) { return f.offsetLeft - strip.offsetLeft > x + 4; })[0];
+          else target = figs.filter(function (f) { return f.offsetLeft - strip.offsetLeft < x - 4; }).pop();
+          var left = target ? Math.min(max, target.offsetLeft - strip.offsetLeft) : (d > 0 ? max : 0);
+          strip.scrollTo({ left: left, behavior: reduce ? 'auto' : 'smooth' });
+        }
+        return;
       }
+      e.preventDefault();          // up/down never turns a card
       return;
     }
     e.preventDefault();
@@ -329,12 +335,13 @@
     if (needGap) { if (gap > 160) needGap = false; else return; }
     if (now < quietUntil || busy) return;
     if (gap > 220) acc = 0;
-    acc += Math.abs(d) * ((dir === 'down' || dir === 'right') ? 1 : -1);
-    if (acc > 36) { acc = 0; next(dir); quietUntil = now + 650; needGap = true; }
+    acc += d;                      // trackpad: fingers moving left give deltaX > 0
+    if (acc > 36) { acc = 0; next('left'); quietUntil = now + 650; needGap = true; }
     else if (acc < -36) { acc = 0; prev(); quietUntil = now + 650; needGap = true; }
   }, { passive: false });
 
-  /* Touch: the top card follows the finger; swipe up or right drops it, down or left brings one back */
+  /* Touch: the top card follows the finger sideways; swipe left for the next card, right to go back.
+     Up and down are left to the browser, so long cards scroll normally. */
   var tStart = null;
   function cancelDrag() {
     if (tStart && tStart.dragging) {
@@ -359,7 +366,7 @@
         var inStrip = target.closest && target.closest('.strip');
         tStart.axis = (inStrip || (target.closest && target.closest('.dots, .gloss'))) ? 'none' : 'x';
       } else {
-        tStart.axis = (canScroll(target, dy < 0 ? 'down' : 'up') || (target.closest && target.closest('.dots, .gloss'))) ? 'none' : 'y';
+        tStart.axis = 'none';
       }
     }
     if (tStart.axis === 'none') return;
@@ -367,8 +374,8 @@
     var c = order[cur];
     tStart.dragging = true;
     c.style.transition = 'none';
-    var mx = tStart.axis === 'x' ? dx : 0;
-    var my = tStart.axis === 'y' ? (dy < 0 ? dy * 0.6 : dy * 0.25) : Math.abs(dx) * 0.08;
+    var mx = dx;
+    var my = Math.abs(dx) * 0.08;
     c.style.transform = 'translate(calc(-50% + ' + mx + 'px), ' + my + 'px) rotate(' + (c._tilt * 0.35 + mx / 22) + 'deg)';
   }, { passive: false });
   deck.addEventListener('touchend', function (e) {
@@ -379,10 +386,8 @@
     if (dragging) order[cur].style.transition = '';
     tStart = null;
     if (!dragging) return;
-    if (axis === 'x' && dx > 70) next('right');
-    else if (axis === 'x' && dx < -70) prev();
-    else if (axis === 'y' && dy < -70) next('down');
-    else if (axis === 'y' && dy > 70) prev();
+    if (axis === 'x' && dx < -70) next('left');
+    else if (axis === 'x' && dx > 70) prev();
     else layout();
   }, { passive: true });
   deck.addEventListener('touchcancel', cancelDrag, { passive: true });
@@ -395,17 +400,19 @@
     });
   }
 
-  /* Keyboard */
+  /* Keyboard: → / PageDown / Space for the next card, ← / PageUp to go back; ↑ ↓ scroll inside a card */
   window.addEventListener('keydown', function (e) {
     if (splashOpen() || e.metaKey || e.ctrlKey || e.altKey) return;
     var tag = (e.target.tagName || '').toLowerCase();
     var onControl = tag === 'button' || tag === 'a' || tag === 'input' || tag === 'textarea';
     var k = e.key;
-    if (k === 'ArrowDown' || k === 'ArrowRight' || k === 'PageDown' || (k === ' ' && !onControl)) {
-      if (k === 'ArrowDown' && canScroll(e.target === document.body ? order[cur] : e.target, 'down')) return;
-      e.preventDefault(); if (!busy) next(k === 'ArrowRight' ? 'right' : 'down');
-    } else if (k === 'ArrowUp' || k === 'ArrowLeft' || k === 'PageUp') {
+    if (k === 'ArrowRight' || k === 'PageDown' || (k === ' ' && !onControl)) {
+      e.preventDefault(); if (!busy) next('left');
+    } else if (k === 'ArrowLeft' || k === 'PageUp') {
       e.preventDefault(); if (!busy) prev();
+    } else if (k === 'ArrowDown' || k === 'ArrowUp') {
+      var inner = order[cur] && order[cur].querySelector('.card-inner');
+      if (inner) { e.preventDefault(); inner.scrollBy({ top: k === 'ArrowDown' ? 80 : -80, behavior: reduce ? 'auto' : 'smooth' }); }
     } else if (k === 'Home') { e.preventDefault(); goTo(0); }
     else if (k === 'End') { e.preventDefault(); goTo(order.length - 1); }
   });
