@@ -115,7 +115,7 @@ body.deck-page { overflow: hidden; overscroll-behavior: none; }
 .card .now { background: transparent; padding: 0; }
 .card .foot-in { font-size: 13px; color: var(--on-accent); opacity: 0.7; margin-top: 8px; }
 .card .photos { display: flex; flex-direction: column; gap: 12px; }
-.card .photos .strip { padding: 0; scroll-padding-inline: 0; }
+.card .photos .strip { padding: 0; scroll-padding-inline: 0; scroll-snap-type: x proximity; }
 .card .photos .strip img { height: clamp(170px, 42vh, 420px); }
 .card .talks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 48px; }
 .card .projects-body { display: flex; flex-direction: column; gap: 18px; max-width: 34em; }
@@ -173,5 +173,29 @@ body.deck-page { overflow: hidden; overscroll-behavior: none; }
   .card .edu-dot { position: absolute; left: -26px; top: 2px; }
   .card .label.title { font-size: 16px; }
   .card .options button { padding: 9px 13px; font-size: 15px; }
-  .card .quote { padding: 10px 0; justify-content: flex-start; }
+  .card .quote { padding: 10px 0 6px; justify-content: center; text-align: center; }
+  .card .quote + figcaption { text-align: center; }
+  .card .split .tones { order: -1; }
 }
+
+/* Tone contours: the travelling point of light */
+@media (prefers-reduced-motion: reduce) {
+  .tones .tone-dot { display: none; }
+}
+
+/* Photo strip: "more" hint */
+.card .photos .more { align-self: flex-end; font-size: 13px; color: var(--muted); }
+
+/* Toast when there is no card further that way */
+.deck-toast {
+  position: fixed; left: 0; right: 0; top: 76px; z-index: 61;
+  width: max-content; max-width: calc(100vw - 32px); margin: 0 auto;
+  padding: 10px 18px; border-radius: 999px;
+  background: var(--ink); color: var(--bg);
+  font-size: 14px; line-height: 1.35; text-align: center;
+  box-shadow: 0 14px 32px -14px rgba(0, 0, 0, 0.45);
+  opacity: 0; transform: translateY(-8px); pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.deck-toast.on { opacity: 1; transform: translateY(0); }
+@media (max-width: 640px) { .deck-toast { top: 64px; font-size: 13px; } }

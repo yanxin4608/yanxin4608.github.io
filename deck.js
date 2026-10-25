@@ -62,8 +62,25 @@
 
   function rand(a, b) { return a + Math.random() * (b - a); }
 
+  /* Short message when there is no card further that way */
+  var toastEl = document.getElementById('deckToast');
+  var toastTimer = null, lastToast = 0;
+  var touchUI = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  function toast(kind) {
+    if (!toastEl) return;
+    var now = Date.now();
+    if (now - lastToast < 1200 && toastEl.classList.contains('on')) return;
+    lastToast = now;
+    var text = toastEl.getAttribute('data-' + kind + (touchUI ? '-touch' : ''));
+    if (!text) return;
+    toastEl.textContent = text;
+    toastEl.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('on'); }, 2400);
+  }
+
   function next(dir) {
-    if (cur >= order.length - 1) { swing(order[cur]); return false; }
+    if (cur >= order.length - 1) { layout(); swing(order[cur]); toast('last'); return false; }
     var c = order[cur];
     if (dir === 'right') c._fall = { x: rand(window.innerWidth * 0.45, window.innerWidth * 0.7), r: rand(22, 34) };
     else c._fall = { x: rand(-60, 60), r: rand(-14, 14) };
@@ -76,7 +93,7 @@
     return true;
   }
   function prev() {
-    if (cur <= 0) { swing(order[0]); return false; }
+    if (cur <= 0) { layout(); swing(order[0]); toast('first'); return false; }
     cur--;
     var c = order[cur];
     c.classList.remove('falling', 'hidden');
@@ -176,6 +193,22 @@
     var d = horizontal ? e.deltaX : e.deltaY;
     var dir = horizontal ? (d > 0 ? 'right' : 'left') : (d > 0 ? 'down' : 'up');
     if (canScroll(e.target, dir)) return;
+    var strip = !horizontal && e.target.closest && e.target.closest('.strip');
+    if (strip && canScroll(strip, d > 0 ? 'right' : 'left')) {
+      // mouse wheel over the photos moves the strip one photo at a time, then the deck takes over
+      e.preventDefault();
+      var tnow = performance.now();
+      if (tnow - (strip._wheelAt || 0) > 450) {
+        strip._wheelAt = tnow;
+        var figs = Array.prototype.slice.call(strip.children);
+        var x = strip.scrollLeft, max = strip.scrollWidth - strip.clientWidth, target = null;
+        if (d > 0) target = figs.filter(function (f) { return f.offsetLeft - strip.offsetLeft > x + 4; })[0];
+        else target = figs.filter(function (f) { return f.offsetLeft - strip.offsetLeft < x - 4; }).pop();
+        var left = target ? Math.min(max, target.offsetLeft - strip.offsetLeft) : (d > 0 ? max : 0);
+        strip.scrollTo({ left: left, behavior: reduce ? 'auto' : 'smooth' });
+      }
+      return;
+    }
     e.preventDefault();
     var now = performance.now();
     var gap = now - lastWheel;
