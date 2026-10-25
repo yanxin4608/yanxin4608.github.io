@@ -442,6 +442,21 @@
     tag.querySelector('.t').textContent = c.getAttribute('data-nav') || c.getAttribute('data-title') || '';
     c.querySelector('.sway').appendChild(tag);
   });
+  /* Shrink each card-face title until it fits the card (phones have narrow cards) */
+  function fitTags() {
+    cards.forEach(function (c) {
+      var tag = c.querySelector('.card-tag'), t = tag && tag.querySelector('.t');
+      if (!t) return;
+      t.style.fontSize = '';
+      var size = parseFloat(getComputedStyle(t).fontSize);
+      var maxW = tag.clientWidth * 0.74, maxH = tag.clientHeight * 0.42;
+      for (var guard = 0; guard < 60 && size > 20; guard++) {
+        if (t.scrollWidth <= maxW && t.offsetHeight <= maxH) break;
+        size -= 3;
+        t.style.fontSize = size + 'px';
+      }
+    });
+  }
   function numberTags(list) {
     list.forEach(function (c, i) {
       Array.prototype.forEach.call(c.querySelectorAll('.card-tag .corner b'), function (el) { el.textContent = pad(i + 1); });
@@ -486,6 +501,7 @@
       });
     };
     numberTags(order);
+    fitTags();
     deck.classList.add('shuffling');
     top.style.transform = 'translate(-50%, -2%) scale(0.96)';
     top.style.opacity = '0.18';
@@ -704,8 +720,10 @@
       var h = intro.querySelector('.w .h');
       charPx = h ? parseFloat(getComputedStyle(h).fontSize) || 40 : 40;
       // the lens (inner diameter about half the drawing) holds one Chinese character with a little room
-      // the Noto lens is about 56% of the drawing wide; 4.4 x the character size fits two characters side by side
-      magSize = Math.round(charPx * 4.4);
+      // the Noto lens is about 56% of the drawing wide:
+      // computers 2.35 x the character size (one character), phones 4.4 x (two characters side by side)
+      var phone = window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches;
+      magSize = Math.round(charPx * (phone ? 4.4 : 2.35));
       mag.style.width = mag.style.height = magSize + 'px';
     };
     sizeMag();

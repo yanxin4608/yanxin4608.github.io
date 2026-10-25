@@ -440,3 +440,14 @@ html:lang(zh-CN) .ticks button { font-size: 13px; }
 
 /* Card backs: pattern and frame only, no emblem */
 .card-tag .back .em { display: none; }
+
+/* Card faces on phones: titles may wrap, and the frame and corners scale down */
+.card-tag .t { max-width: 100%; overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .card-tag .face { gap: 26px; padding: 0 13%; }
+  .card-tag .corner b { font-size: 48px; }
+  .card-tag .corner i { font-size: 32px; }
+  .card-tag .tl { top: 54px; left: 50px; }
+  .card-tag .br { bottom: 54px; right: 50px; }
+  .card-tag .orn { width: 160px; }
+}
