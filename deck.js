@@ -704,7 +704,8 @@
       var h = intro.querySelector('.w .h');
       charPx = h ? parseFloat(getComputedStyle(h).fontSize) || 40 : 40;
       // the lens (inner diameter about half the drawing) holds one Chinese character with a little room
-      magSize = Math.round(charPx * 2.35);
+      // the Noto lens is about 56% of the drawing wide; 4.4 x the character size fits two characters side by side
+      magSize = Math.round(charPx * 4.4);
       mag.style.width = mag.style.height = magSize + 'px';
     };
     sizeMag();
@@ -713,7 +714,7 @@
       mag.style.transform = 'translate(' + (x - magSize * LENS_X) + 'px, ' + (y - magSize * LENS_Y) + 'px)';
     };
     var dodge = function (x, y) {
-      var radius = Math.max(90, charPx * 2.4), push = charPx * 1.7;
+      var radius = Math.max(110, magSize * 0.32 + charPx * 1.2), push = charPx * 2;
       gwords.forEach(function (w) {
         var r = w.getBoundingClientRect();
         var dx = r.left + r.width / 2 - x, dy = r.top + r.height / 2 - y;
