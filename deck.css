@@ -8,24 +8,30 @@ body.deck-page { overflow: hidden; overscroll-behavior: none; }
 
 .progress {
   position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 50;
-  display: flex; align-items: center; gap: 4px;
-  color: var(--muted); font-size: 12px;
+  max-width: calc(100vw - 24px);
+  display: flex; align-items: center;
 }
-.progress .step {
-  width: 36px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
-  color: var(--muted); border-radius: 999px;
+.ticks {
+  display: flex; align-items: center; gap: 2px;
+  overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain;
 }
-.progress .step:hover { color: var(--ink); opacity: 1; }
-.progress .step:disabled { opacity: 0.3; cursor: default; }
-.progress .step svg { width: 16px; height: 16px; display: block; }
-.ticks { display: flex; align-items: center; }
+.ticks::-webkit-scrollbar { display: none; }
 .ticks button {
-  width: 14px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0; min-height: 40px; padding: 0 10px; border-radius: 999px;
+  font-size: 13px; color: var(--muted); white-space: nowrap;
+  transition: color 0.25s ease, background-color 0.25s ease;
 }
-.ticks button span { display: block; width: 1px; height: 10px; background: var(--tick); transition: width 0.25s ease, background-color 0.25s ease; }
-.ticks button.on span { width: 16px; background: transparent; border: 1px solid var(--muted); }
-.ticks button:hover span { background: var(--muted); }
-.ticks button.on:hover span { background: transparent; }
+@media (hover: hover) { .ticks button:hover { color: var(--ink); opacity: 1; } }
+.ticks button:hover { opacity: 1; }
+.ticks button { position: relative; }
+.ticks button.on { color: var(--sage-deep); font-weight: 700; }
+.ticks button::after {
+  content: ''; position: absolute; left: 10px; right: 10px; bottom: 7px; height: 2px; border-radius: 2px;
+  background: var(--sage); transform: scaleX(0); transition: transform 0.3s ease;
+}
+.ticks button.on::after { transform: scaleX(1); }
+html:lang(zh-CN) .ticks button { font-size: 13px; }
+
 /* Floating hint with a confirm button */
 .deck-hint {
   position: fixed; left: 0; right: 0; bottom: 160px; z-index: 60;
@@ -52,14 +58,63 @@ body.deck-page { overflow: hidden; overscroll-behavior: none; }
 
 /* Shuffle: the real cards fan out, shuffle and deal back */
 .card-tag {
-  position: absolute; inset: 0; z-index: 4; border-radius: 3px;
-  background: var(--paper); color: var(--ink);
-  box-shadow: 0 0 0 1px var(--line);
-  display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 6%;
-  font-size: clamp(64px, 7vw, 92px); line-height: 1.1; letter-spacing: -0.02em;
+  position: absolute; inset: 0; z-index: 4; border-radius: 22px; overflow: hidden;
   opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+  box-shadow: 0 0 0 2px var(--line), 0 50px 90px -40px rgba(0, 0, 0, 0.5);
 }
-.card-inner.sage + .card-tag { background: var(--sage); color: var(--on-accent); }
+.card-tag .face, .card-tag .back {
+  position: absolute; inset: 0; border-radius: inherit; transition: opacity 0.22s ease;
+}
+/* Face: a quiet playing card with a double frame, corner indices and a centred title */
+.card-tag .face {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.55), transparent 60%),
+    var(--paper);
+  color: var(--ink);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 34px;
+  text-align: center; padding: 0 12%;
+}
+.card-tag .face::before, .card-tag .face::after {
+  content: ''; position: absolute; border-radius: 12px; pointer-events: none;
+}
+.card-tag .face::before { inset: 26px; border: 3px solid var(--line); }
+.card-tag .face::after { inset: 40px; border: 1.5px solid var(--line); border-radius: 8px; }
+.card-tag .t { position: relative; font-size: clamp(76px, 8vw, 104px); line-height: 1.05; letter-spacing: -0.02em; }
+.card-tag .orn { position: relative; width: 220px; height: 3px; background: linear-gradient(90deg, transparent, var(--sage-deep), transparent); }
+.card-tag .orn::after {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+  background: var(--sage-deep); transform: rotate(45deg); border: 5px solid var(--paper);
+}
+.card-tag .corner {
+  position: absolute; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: var(--sage-deep); font-variant-numeric: tabular-nums; line-height: 1; z-index: 1;
+}
+.card-tag .corner b { font-size: 56px; font-weight: 600; letter-spacing: 0.02em; }
+.card-tag .corner i { font-style: normal; font-size: 38px; }
+.card-tag .tl { top: 62px; left: 70px; }
+.card-tag .br { bottom: 62px; right: 70px; transform: rotate(180deg); }
+.card-inner.sage + .card-tag .face { background: radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.35), transparent 60%), var(--sage); color: var(--on-accent); }
+.card-inner.sage + .card-tag .orn::after { border-color: var(--sage); }
+/* Back: a woven sage pattern with a schwa in the middle */
+.card-tag .back {
+  opacity: 0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.10), transparent 55%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.13) 0 3px, transparent 3px 30px),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.13) 0 3px, transparent 3px 30px),
+    #56624F;
+  display: flex; align-items: center; justify-content: center;
+}
+.card-tag .back::before { content: ''; position: absolute; inset: 30px; border: 4px solid rgba(255, 255, 255, 0.55); border-radius: 12px; }
+.card-tag .back::after { content: ''; position: absolute; inset: 46px; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 8px; }
+.card-tag .back .em {
+  width: 190px; height: 190px; border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.7); background: rgba(0, 0, 0, 0.12);
+  display: flex; align-items: center; justify-content: center;
+  color: #FFFFFF; font-family: "Iowan Old Style", Georgia, serif; font-size: 130px; line-height: 1; padding-bottom: 18px; box-sizing: border-box;
+}
+.deck.backs .card-tag .back { opacity: 1; }
+.deck.backs .card-tag .face { opacity: 0; }
 .deck.shuffling .card-tag { opacity: 1; }
 .deck.shuffling .card.is-top .card-tag { opacity: 0; }
 .deck.shuffling .card { transition: transform 0.4s cubic-bezier(0.3, 0.7, 0.3, 1), opacity 0.3s ease; }
@@ -152,7 +207,9 @@ body.deck-page { overflow: hidden; overscroll-behavior: none; }
   .card-inner { padding: 26px 18px 22px; justify-content: flex-start; }
   .card .talks { grid-template-columns: 1fr; gap: 14px; }
   .card .photos .strip img { height: clamp(150px, 34vh, 260px); }
-  .progress { bottom: 12px; }
+  .progress { bottom: 12px; left: 0; right: 0; transform: none; max-width: none; }
+  .ticks { width: 100%; padding: 0 12px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 18px), transparent); mask-image: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 18px), transparent); }
+  .ticks button { padding: 0 9px; }
   .deck-hint { bottom: 132px; font-size: 13px; padding-left: 14px; gap: 10px; }
 }
 
@@ -199,3 +256,187 @@ body.deck-page { overflow: hidden; overscroll-behavior: none; }
 }
 .deck-toast.on { opacity: 1; transform: translateY(0); }
 @media (max-width: 640px) { .deck-toast { top: 64px; font-size: 13px; } }
+
+/* First card: magnifier cursor */
+.magnifier {
+  position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none;
+  opacity: 0; transition: opacity 0.15s ease; will-change: transform;
+}
+.magnifier.on { opacity: 1; }
+.magnifier img { width: 100%; height: 100%; display: block; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.22)); }
+@media (hover: hover) and (pointer: fine) {
+  .card[data-id="hello"] .card-inner, .card[data-id="hello"] .card-inner * { cursor: none; }
+}
+
+/* Education as a journey: passport stamps joined by a flight path */
+.card .journey { position: relative; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 18px; padding-left: 0; }
+.card .journey::before, .card .journey::after { display: none; }
+.journey .route { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }
+.journey .route-line { fill: none; stroke: var(--sage-deep); stroke-width: 1.6; stroke-dasharray: 2 7; stroke-linecap: round; opacity: 0.6; }
+.journey .plane { fill: var(--sage-deep); opacity: 0; transition: opacity 0.3s ease; }
+.journey .plane.flying { opacity: 1; }
+.journey .edu-node { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.stamp {
+  --rot: 0deg;
+  position: relative; flex-shrink: 0;
+  width: 104px; height: 104px; border-radius: 50%;
+  border: 3px solid var(--sage-deep); color: var(--sage-deep); background: var(--paper);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  transform: rotate(var(--rot)); opacity: 0.92;
+}
+.stamp::before { content: ''; position: absolute; inset: 5px; border: 1px dashed currentColor; border-radius: 50%; opacity: 0.8; }
+.stamp .city { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+.stamp .word { font-size: 22px; line-height: 1.1; font-weight: 600; }
+.stamp .word:lang(en) { font-size: 34px; font-family: "Iowan Old Style", Georgia, serif; font-weight: 400; line-height: 0.9; }
+.stamp .yr { font-size: 10px; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+.journey-cap { margin-top: 18px; }
+/* The stamps are pressed one by one as the plane arrives */
+.card.is-top .journey .stamp { animation: stamp-in 0.55s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+.card.is-top .journey .edu-node:nth-of-type(1) .stamp { animation-delay: 0.25s; }
+.card.is-top .journey .edu-node:nth-of-type(2) .stamp { animation-delay: 1.7s; }
+.card.is-top .journey .edu-node:nth-of-type(3) .stamp { animation-delay: 3.15s; }
+@keyframes stamp-in {
+  0% { opacity: 0; transform: rotate(var(--rot)) scale(1.9); }
+  60% { opacity: 0.95; transform: rotate(var(--rot)) scale(0.9); }
+  100% { opacity: 0.92; transform: rotate(var(--rot)) scale(1); }
+}
+@media (max-width: 640px) {
+  .card .journey { grid-template-columns: 1fr; gap: 26px; padding-left: 0; }
+  .journey .edu-node { flex-direction: row; align-items: center; gap: 18px; }
+  .stamp { width: 84px; height: 84px; }
+  .stamp .word { font-size: 18px; }
+  .stamp .word:lang(en) { font-size: 28px; }
+  .stamp .city, .stamp .yr { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card.is-top .journey .stamp { animation: none; }
+  .journey .plane { display: none; }
+}
+.stamp .word:lang(ru) { font-size: 17px; letter-spacing: -0.01em; }
+.stamp .city { letter-spacing: 0.1em; }
+@media (max-width: 640px) {
+  .stamp .word:lang(ru) { font-size: 14px; }
+  .stamp .city { letter-spacing: 0.06em; }
+}
+
+/* Captions sit centred under their figure */
+.card .tones figcaption,
+.card .dots + .label,
+.card .quote + figcaption { text-align: center; align-self: center; width: 100%; }
+
+/* Journey v2: coordinates on top, the city in the middle, stamps a little out of line */
+.stamp { width: 108px; height: 108px; gap: 3px; }
+.stamp .geo { font-size: 8.5px; letter-spacing: 0.02em; white-space: nowrap; font-variant-numeric: tabular-nums; opacity: 0.9; }
+.stamp .city { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.stamp .city:lang(zh-CN) { font-size: 20px; letter-spacing: 0.12em; text-transform: none; font-weight: 600; }
+.stamp .yr { font-size: 9.5px; }
+.card .journey .edu-node:nth-of-type(1) { margin-top: 26px; }
+.card .journey .edu-node:nth-of-type(2) { margin-top: 0; }
+.card .journey .edu-node:nth-of-type(3) { margin-top: 40px; }
+.journey .route-line { stroke-width: 1.5; stroke-dasharray: 1.5 7; }
+/* stamping is now timed by the plane */
+.card.is-top .journey .stamp { animation: none; }
+.journey.flying .stamp { opacity: 0; }
+.journey.flying .stamp.stamped { animation: stamp-in 0.55s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+@media (max-width: 640px) {
+  .stamp { width: 90px; height: 90px; }
+  .stamp .geo { font-size: 7.5px; letter-spacing: 0; }
+  .stamp .city { font-size: 11.5px; letter-spacing: 0.03em; }
+  .stamp .city:lang(zh-CN) { font-size: 17px; }
+  .card .journey .edu-node:nth-of-type(1) { margin-top: 0; margin-left: 0; }
+  .card .journey .edu-node:nth-of-type(2) { margin-left: 22px; }
+  .card .journey .edu-node:nth-of-type(3) { margin-top: 0; margin-left: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey.flying .stamp { opacity: 0.92; }
+}
+
+/* Journey v3: rail line to Beijing, flight path to Cambridge */
+.journey .route path { fill: none; stroke: var(--sage-deep); stroke-linecap: round; }
+.journey .route-ext { stroke-width: 1.4; stroke-dasharray: 1.5 7; opacity: 0.4; }
+.journey .rail-ties { stroke-width: 7; stroke-dasharray: 1.6 6; stroke-linecap: butt; opacity: 0.45; }
+.journey .rail-line { stroke-width: 1.6; opacity: 0.75; }
+.journey .route-flight { stroke-width: 1.5; stroke-dasharray: 5 6; opacity: 0.6; }
+.journey .vehicle { opacity: 0; transition: opacity 0.25s ease; }
+.journey .vehicle path:not(.win) { fill: var(--sage-deep); stroke: none; }
+.journey .vehicle .win { fill: var(--paper); stroke: none; }
+.journey .vehicle.moving { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .journey .vehicle { display: none; } }
+/* stamps are pressed exactly when the train or plane arrives (no fixed delays) */
+.journey.flying .stamp.stamped { animation-delay: 0s !important; }
+@media (max-width: 640px) {
+  .stamp { width: 94px; height: 94px; }
+  .stamp .city { font-size: 10.5px; letter-spacing: 0.02em; }
+  .stamp .city:lang(zh-CN) { font-size: 17px; letter-spacing: 0.1em; }
+}
+
+/* Journey v4: stamps laid out roughly like a map (Cambridge far west; Beijing north of Hefei) */
+.card .journey { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto; gap: 30px 28px; margin-top: 22px; }
+.card .journey .edu-node { flex-direction: row; align-items: center; gap: 16px; margin: 0 !important; }
+.card .journey .edu-node:nth-of-type(1) { grid-column: 3; grid-row: 2; padding-left: 34px; }   /* Hefei */
+.card .journey .edu-node:nth-of-type(2) { grid-column: 3; grid-row: 1; padding-left: 0; }      /* Beijing */
+.card .journey .edu-node:nth-of-type(3) { grid-column: 1; grid-row: 1; padding-top: 18px; }    /* Cambridge */
+.card .journey .edu-card { min-width: 0; }
+.stamp .geo { display: flex; flex-direction: column; align-items: center; line-height: 1.12; font-size: 8.5px; letter-spacing: 0.02em; }
+.stamp .city { font-size: 13px; letter-spacing: 0.04em; }
+.journey .vehicle image { overflow: visible; }
+@media (max-width: 900px) and (min-width: 641px) {
+  .card .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .card .journey .edu-node:nth-of-type(1) { grid-column: 2; }
+  .card .journey .edu-node:nth-of-type(2) { grid-column: 2; }
+}
+@media (max-width: 640px) {
+  .card .journey { grid-template-columns: 1fr; grid-template-rows: auto auto auto; gap: 24px; }
+  .card .journey .edu-node:nth-of-type(3) { grid-column: 1; grid-row: 1; padding: 0; }           /* Cambridge, top left */
+  .card .journey .edu-node:nth-of-type(2) { grid-column: 1; grid-row: 2; padding-left: 40px; }   /* Beijing */
+  .card .journey .edu-node:nth-of-type(1) { grid-column: 1; grid-row: 3; padding-left: 56px; }   /* Hefei */
+  .card .journey .edu-node { gap: 12px; }
+  .stamp .geo { font-size: 7.5px; }
+}
+
+/* Journey v5: back to one horizontal line, Cambridge on the left, Anhui on the right */
+.card .journey { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; grid-template-rows: auto !important; gap: 28px; }
+.card .journey .edu-node { flex-direction: column; align-items: flex-start; gap: 16px; padding: 0 !important; grid-row: 1 !important; }
+.card .journey .edu-node:nth-of-type(3) { grid-column: 1 !important; }   /* Cambridge */
+.card .journey .edu-node:nth-of-type(2) { grid-column: 2 !important; }   /* Beijing */
+.card .journey .edu-node:nth-of-type(1) { grid-column: 3 !important; }   /* Hefei */
+.edu-card .sd strong { font-weight: 600; }
+@media (max-width: 640px) {
+  .card .journey { grid-template-columns: 1fr !important; grid-template-rows: auto auto auto !important; gap: 24px; }
+  .card .journey .edu-node { flex-direction: row; align-items: center; gap: 12px; grid-column: 1 !important; }
+  .card .journey .edu-node:nth-of-type(3) { grid-row: 1 !important; }
+  .card .journey .edu-node:nth-of-type(2) { grid-row: 2 !important; }
+  .card .journey .edu-node:nth-of-type(1) { grid-row: 3 !important; }
+}
+@media (max-width: 640px) {
+  .card .journey .edu-node:nth-of-type(1),
+  .card .journey .edu-node:nth-of-type(2),
+  .card .journey .edu-node:nth-of-type(3) { grid-column: 1 !important; }
+}
+
+/* Journey v6: Hefei → Beijing → Cambridge from left to right, each a step higher; centred in their columns */
+.card .journey .edu-node { align-items: center !important; text-align: center; }
+.card .journey .edu-card { align-items: center; }
+.card .journey .edu-node:nth-of-type(1) { grid-column: 1 !important; margin-top: 64px !important; }   /* Hefei */
+.card .journey .edu-node:nth-of-type(2) { grid-column: 2 !important; margin-top: 32px !important; }   /* Beijing */
+.card .journey .edu-node:nth-of-type(3) { grid-column: 3 !important; margin-top: 0 !important; }      /* Cambridge */
+@media (max-width: 640px) {
+  /* phones: from the bottom up — Cambridge on top, Hefei at the bottom */
+  .card .journey .edu-node { align-items: center !important; text-align: left; margin-top: 0 !important; }
+  .card .journey .edu-card { align-items: flex-start; }
+  .card .journey .edu-node:nth-of-type(1),
+  .card .journey .edu-node:nth-of-type(2),
+  .card .journey .edu-node:nth-of-type(3) { grid-column: 1 !important; margin-top: 0 !important; }
+  .card .journey .edu-node:nth-of-type(3) { grid-row: 1 !important; }
+  .card .journey .edu-node:nth-of-type(2) { grid-row: 2 !important; }
+  .card .journey .edu-node:nth-of-type(1) { grid-row: 3 !important; }
+}
+
+/* Journey v7: one line style for the whole route */
+.journey .route-ext, .journey .rail-line, .journey .route-flight {
+  stroke: var(--sage-deep); stroke-width: 1.6; stroke-dasharray: 5 6; stroke-linecap: round; opacity: 0.6;
+}
+.journey .rail-ties { display: none; }
+
+/* Card backs: pattern and frame only, no emblem */
+.card-tag .back .em { display: none; }

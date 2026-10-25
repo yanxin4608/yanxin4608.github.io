@@ -28,7 +28,7 @@
 <main class="deck" id="deck">
 
   <!-- 1. 简介 -->
-  <article class="card" data-title="你好">
+  <article class="card" data-id="hello" data-nav="你好" data-title="你好">
     <div class="sway"><div class="card-inner">
       <section class="intro" aria-label="简介">
         <div class="gloss" lang="zh-CN" id="gloss">
@@ -47,42 +47,54 @@
           <span class="w"><span class="h">拍照。</span><span class="p" lang="zh-Latn">pāizhào</span><span class="g" lang="en">photograph</span></span>
           <span class="tr-en" lang="en"><span class="ew">Hello!</span> <span class="ew">I’m</span> <span class="ew">Xin</span> <span class="ew">Yan.</span> <span class="ew">I</span> <span class="ew">study</span> <span class="ew">how</span> <span class="ew">people</span> <span class="ew">learn</span> <span class="ew">languages.</span> <span class="ew">I</span> <span class="ew">teach</span> <span class="ew">Chinese.</span> <span class="ew">And</span> <span class="ew">sometimes</span> <span class="ew">take</span> <span class="ew">photographs.</span></span>
         </div>
-        <span class="hint" data-touch="用手指划过这些字试试">用鼠标划过这些字试试</span>
+        <span class="hint" data-touch="用手指拖动放大镜，划过这些字试试">用放大镜划过这些字试试</span>
       </section>
     </div></div>
   </article>
 
   <!-- 2. 教育背景 -->
-  <article class="card" data-title="教育背景">
+  <article class="card" data-id="education" data-nav="教育" data-title="教育背景">
     <div class="sway"><div class="card-inner">
       <section class="edu" aria-label="教育背景">
         <span class="label title">教育背景</span>
-        <figure class="edu-map">
+        <figure class="edu-map journey">
+          <svg class="route" aria-hidden="true">
+            <path class="route-ext route-in" d="M0 0"/>
+            <path class="rail-ties" d="M0 0"/>
+            <path id="railPath" class="rail-line" d="M0 0"/>
+            <path id="flightPath" class="route-flight" d="M0 0"/>
+            <path class="route-ext route-out" d="M0 0"/>
+            <g class="vehicle train">
+              <g transform="scale(-1 1)"><image class="vimg" href="train.svg" x="-22" y="-22" width="44" height="44"/></g>
+              <animateMotion id="trainGo" dur="2s" begin="indefinite" fill="freeze" rotate="auto"><mpath href="#railPath"/></animateMotion>
+            </g>
+            <g class="vehicle plane">
+              <g transform="rotate(45)"><image class="vimg" href="plane.svg" x="-22" y="-22" width="44" height="44"/></g>
+              <animateMotion id="planeGo" dur="2s" begin="indefinite" fill="freeze" rotate="auto"><mpath href="#flightPath"/></animateMotion>
+            </g>
+          </svg>
           <div class="edu-node">
-            <span class="edu-dot"></span>
+            <span class="stamp" style="--rot: -8deg"><span class="geo"><span>31.77°N</span><span>117.19°E</span></span><span class="city">合肥</span><span class="yr">2011–15</span></span>
             <div class="edu-card">
-              <span class="edu-place">剑桥 · 英国</span>
-              <strong>剑桥大学</strong>
-              <span>博士，语言学与语言习得</span>
-              <span class="meta">2022–至今 · 论文已于 2026 提交<br>AHRC (UKRI) 全额奖学金</span>
+              <span class="sd"><strong>安徽大学</strong> 学士</span>
+              <span>俄语语言文学</span>
+              <span class="meta">2011–2015</span>
             </div>
           </div>
           <div class="edu-node">
-            <span class="edu-dot"></span>
+            <span class="stamp" style="--rot: 6deg"><span class="geo"><span>39.99°N</span><span>116.30°E</span></span><span class="city">北京</span><span class="yr">2019–22</span></span>
             <div class="edu-card">
-              <span class="edu-place">北京 · 中国</span>
-              <strong>北京大学</strong>
-              <span>硕士，对外汉语教学</span>
+              <span class="sd"><strong>北京大学</strong> 硕士</span>
+              <span>汉语国际教育</span>
               <span class="meta">2019–2022 · GPA 3.8/4.0，排名 1/31<br>国家奖学金、优秀毕业生</span>
             </div>
           </div>
           <div class="edu-node">
-            <span class="edu-dot"></span>
+            <span class="stamp" style="--rot: -4deg"><span class="geo"><span>52.21°N</span><span>0.12°E</span></span><span class="city">剑桥</span><span class="yr">2022–26</span></span>
             <div class="edu-card">
-              <span class="edu-place">安徽 · 中国</span>
-              <strong>安徽大学</strong>
-              <span>学士，俄语语言文学</span>
-              <span class="meta">2011–2015</span>
+              <span class="sd"><strong>剑桥大学</strong> 博士</span>
+              <span>汉语语言学与语言习得</span>
+              <span class="meta">2022–至今 · 论文已于 2026 提交<br>AHRC (UKRI) 全额奖学金</span>
             </div>
           </div>
         </figure>
@@ -91,7 +103,7 @@
   </article>
 
   <!-- 3. 选词填空：为后面的卡片洗牌 -->
-  <article class="card" data-title="选词填空">
+  <article class="card" data-id="reader" data-nav="按身份浏览" data-title="选词填空">
     <div class="sway"><div class="card-inner">
       <section class="cloze" aria-label="谁在读">
         <span class="label title">选词填空</span>
@@ -109,12 +121,12 @@
   </article>
 
   <!-- 4–8. 可重排的卡片 -->
-  <article class="card" data-title="教学" data-key="teaching">
+  <article class="card" data-id="teaching" data-nav="教学" data-title="教学" data-key="teaching">
     <div class="sway"><div class="card-inner">
       <section class="split" aria-label="教学">
         <div class="stack">
           <span class="label title">教学</span>
-          <div class="item"><span>剑桥大学代任讲师与本科生辅导课督导</span><span class="meta">2022–2026 · 四门本科现代汉语课程与小班辅导</span></div>
+          <div class="item"><span>剑桥大学代任讲师与本科生辅导课教师</span><span class="meta">2022–2026 · 四门本科现代汉语课程与小班辅导</span></div>
           <div class="item"><span>北京大学（燕京学堂 · 预科项目）助教</span><span class="meta">2019–2022</span></div>
           <div class="item"><span>乌克兰哈尔科夫国立大学汉语教师</span><span class="meta">2015–2018 · 初级到中高级课程、HSK 备考、副校长嘉奖</span></div>
         </div>
@@ -147,7 +159,7 @@
     </div></div>
   </article>
 
-  <article class="card" data-title="教育产品" data-key="product">
+  <article class="card" data-id="edtech" data-nav="教育产品" data-title="教育产品" data-key="product">
     <div class="sway"><div class="card-inner">
       <section class="stack" style="gap: 10px" aria-label="教育产品">
         <span class="label title">教育产品</span>
@@ -158,7 +170,7 @@
     </div></div>
   </article>
 
-  <article class="card" data-title="发表" data-key="pubs">
+  <article class="card" data-id="publications" data-nav="发表" data-title="发表" data-key="pubs">
     <div class="sway"><div class="card-inner">
       <section class="split" aria-label="发表" style="align-items: flex-start">
         <figure class="stack" style="gap: 16px">
@@ -177,23 +189,23 @@
     </div></div>
   </article>
 
-  <article class="card" data-title="报告" data-key="talks">
+  <article class="card" data-id="talks" data-nav="报告" data-title="报告" data-key="talks">
     <div class="sway"><div class="card-inner">
       <section class="stack" style="gap: 22px" aria-label="报告">
         <span class="label title">报告</span>
         <div class="talks">
           <div class="item"><span>单方言与双方言普通话的指称锚定</span><span class="meta">海报 · GASLA 18，剑桥，2026</span></div>
-          <div class="item"><span>俄语母语者对二语汉语 wh 成分歧义消解中的接口问题</span><span class="meta">报告 · BUCLD 49，波士顿，2024</span></div>
-          <div class="item"><span>二语汉语接口处的 wh 成分歧义消解：韵律与句法</span><span class="meta">报告 · GALA 16，里斯本，2024</span></div>
+          <div class="item"><span>俄语母语者对二语汉语 wh 成分歧义消解中的接口问题</span><span class="meta">口头报告 · BUCLD 49，波士顿，2024</span></div>
+          <div class="item"><span>二语汉语接口处的 wh 成分歧义消解：韵律与句法</span><span class="meta">口头报告 · GALA 16，里斯本，2024</span></div>
           <div class="item"><span>俄语母语者对汉语功能词“和”的习得</span><span class="meta">海报 · YLMP 2021，波兹南，2021</span></div>
-          <div class="item"><span>俄语母语者对二语汉语连词“和”的习得</span><span class="meta">报告 · ExLing 2020，雅典，2020</span></div>
-          <div class="item"><span>汉语“在”字的用法</span><span class="meta">报告 · 第二届乌克兰东方学会议，哈尔科夫，2018</span></div>
+          <div class="item"><span>俄语母语者对二语汉语连词“和”的习得</span><span class="meta">口头报告 · ExLing 2020，雅典，2020</span></div>
+          <div class="item"><span>汉语“在”字的用法</span><span class="meta">口头报告 · 第二届乌克兰东方学会议，哈尔科夫，2018</span></div>
         </div>
       </section>
     </div></div>
   </article>
 
-  <article class="card" data-title="摄影" data-key="photo">
+  <article class="card" data-id="photos" data-nav="摄影" data-title="摄影" data-key="photo">
     <div class="sway"><div class="card-inner">
       <section class="photos" aria-label="摄影">
         <span class="label title">摄影</span>
@@ -208,7 +220,7 @@
   </article>
 
   <!-- 9. 项目 -->
-  <article class="card" data-title="项目">
+  <article class="card" data-id="projects" data-nav="项目" data-title="项目">
     <div class="sway"><div class="card-inner">
       <section class="projects-body" aria-label="项目">
         <span class="label title">项目</span>
@@ -218,7 +230,7 @@
   </article>
 
   <!-- 10. 近况 -->
-  <article class="card" data-title="近况">
+  <article class="card" data-id="contact" data-nav="近况与联络方式" data-title="近况">
     <div class="sway"><div class="card-inner sage">
       <section class="now" aria-label="近况">
         <span class="now-head">近况 · 2026 年 10 月</span>
@@ -240,13 +252,11 @@
 
 </main>
 
-<div class="deck-toast" id="deckToast" role="status" aria-live="polite" data-first="这是第一张，向下滚动或向右滑动看下一张" data-first-touch="这是第一张，向上或向右滑动看下一张" data-last="已经是最后一张，向上滚动或向左滑动返回" data-last-touch="已经是最后一张，向下或向左滑动返回"></div>
-<div class="deck-hint" id="deckHint" role="status" data-touch="向上或向右滑动，让卡片落下"><span>向下滚动，或向右滑动，让卡片落下</span><button type="button" id="hintOk">知道了</button></div>
+<div class="deck-toast" id="deckToast" role="status" aria-live="polite" data-first="这是第一张，向下滚动看下一张" data-first-touch="这是第一张，向上滑动看下一张" data-last="已经是最后一张，向上滚动返回" data-last-touch="已经是最后一张，向下滑动返回"></div>
+<div class="deck-hint" id="deckHint" role="status" data-touch="向上滑动翻卡片，或点下方目录直达"><span>向下滚动翻卡片，或点下方目录直达</span><button type="button" id="hintOk">知道了</button></div>
 
-<nav class="progress" aria-label="卡片">
-  <button class="step" id="prev" type="button" aria-label="上一张"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
-  <div class="ticks" id="ticks"></div>
-  <button class="step" id="next" type="button" aria-label="下一张"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
+<nav class="progress" aria-label="目录">
+  <div class="ticks" id="ticks" role="list"></div>
 </nav>
 
 </body>

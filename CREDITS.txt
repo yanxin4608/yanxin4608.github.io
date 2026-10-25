@@ -1,0 +1,11 @@
+Third-party assets used on this site
+
+magnifier.svg, train.svg, plane.svg
+  "Magnifying glass tilted left", "Railway car" and "Airplane" from Noto Emoji
+  Copyright Google Inc.
+  Licensed under the Apache License, Version 2.0
+  https://github.com/googlefonts/noto-emoji
+  https://www.apache.org/licenses/LICENSE-2.0
+
+fonts/inter-tight-*.woff2
+  Inter Tight, SIL Open Font License 1.1 (see fonts/OFL-LICENSE.txt)

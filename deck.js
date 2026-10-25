@@ -29,7 +29,94 @@
     return 'translate(calc(-50% + ' + c._fall.x + 'px), 125vh) rotate(' + c._fall.r + 'deg)';
   }
 
+  var hideMag = function () {};
+  var lastTopId = null;
+  /* Education card: draw the flight path through the stamps and fly the plane each time the card comes up */
+  /* Fit the words inside each stamp's inner ring */
+  function fitStamps(map) {
+    Array.prototype.forEach.call(map.querySelectorAll('.stamp'), function (st) {
+      var R = st.offsetWidth / 2 - 9;                     // inside the dashed ring
+      var cy = st.offsetHeight / 2;
+      Array.prototype.forEach.call(st.querySelectorAll('.geo > span, .city, .yr'), function (el) {
+        el.style.fontSize = '';
+        var size = parseFloat(getComputedStyle(el).fontSize);
+        for (var guard = 0; guard < 24; guard++) {
+          var top = el.offsetTop + (el.parentNode !== st ? el.parentNode.offsetTop : 0);
+          var y = Math.max(Math.abs(top - cy), Math.abs(top + el.offsetHeight - cy));
+          var chord = 2 * Math.sqrt(Math.max(0, R * R - y * y)) - 4;
+          if (el.scrollWidth <= chord || size <= 6) break;
+          size -= 0.5;
+          el.style.fontSize = size + 'px';
+        }
+      });
+    });
+  }
+  /* Education card: stamp Hefei, train to Beijing, stamp Beijing, fly to Cambridge, stamp Cambridge */
+  function flyJourney() {
+    var map = deck.querySelector('.journey');
+    if (!map) return;
+    fitStamps(map);
+    var svg = map.querySelector('.route');
+    var stamps = Array.prototype.slice.call(map.querySelectorAll('.stamp'));
+    if (stamps.length < 3) return;
+    var pts = stamps.map(function (st) {
+      return { x: st.offsetLeft + st.offsetWidth / 2 + st.parentNode.offsetLeft, y: st.offsetTop + st.offsetHeight / 2 + st.parentNode.offsetTop };
+    });
+    var W = map.clientWidth, H = map.clientHeight;
+    var away = function (from, to, dist) {               // a point beyond 'from', continuing away from 'to'
+      var dx = from.x - to.x, dy = from.y - to.y, l = Math.hypot(dx, dy) || 1;
+      return { x: from.x + dx / l * dist, y: from.y + dy / l * dist };
+    };
+    var start = away(pts[0], pts[1], 420), end = away(pts[2], pts[1], 420);
+    // every leg is the same kind of curve: a gentle bow to the left of the direction of travel (upward when going east)
+    var leg = function (a, b) {
+      var dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1;
+      var k = Math.min(70, l * 0.2), nx = dy / l * k, ny = -dx / l * k;
+      var f = function (n) { return n.toFixed(1); };
+      return 'M' + f(a.x) + ' ' + f(a.y) + ' C' + f(a.x + dx / 3 + nx) + ' ' + f(a.y + dy / 3 + ny) + ' ' +
+        f(a.x + dx * 2 / 3 + nx) + ' ' + f(a.y + dy * 2 / 3 + ny) + ' ' + f(b.x) + ' ' + f(b.y);
+    };
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    map.querySelector('.route-in').setAttribute('d', leg(start, pts[0]));
+    map.querySelector('.rail-ties').setAttribute('d', leg(pts[0], pts[1]));
+    map.querySelector('.rail-line').setAttribute('d', leg(pts[0], pts[1]));
+    map.querySelector('.route-flight').setAttribute('d', leg(pts[1], pts[2]));
+    map.querySelector('.route-out').setAttribute('d', leg(pts[2], end));
+    var vsize = W < 500 ? 36 : 46;
+    Array.prototype.forEach.call(map.querySelectorAll('.vimg'), function (im) {
+      im.setAttribute('width', vsize); im.setAttribute('height', vsize);
+      im.setAttribute('x', -vsize / 2); im.setAttribute('y', -vsize / 2);
+    });
+    var train = map.querySelector('.train'), plane = map.querySelector('.plane');
+    var trainGo = map.querySelector('#trainGo'), planeGo = map.querySelector('#planeGo');
+    (map._timers || []).forEach(clearTimeout);
+    map._timers = [];
+    var at = function (ms, fn) { map._timers.push(setTimeout(fn, ms)); };
+    stamps.forEach(function (st) { st.classList.remove('stamped'); });
+    train.classList.remove('moving'); plane.classList.remove('moving');
+    if (reduce || !trainGo || !trainGo.beginElement) { map.classList.remove('flying'); return; }
+    map.classList.add('flying');
+    var railLen = map.querySelector('.rail-line').getTotalLength();
+    var flightLen = map.querySelector('.route-flight').getTotalLength();
+    var dt = Math.min(2.4, Math.max(1.4, railLen / 180));
+    var dp = Math.min(3.0, Math.max(1.8, flightLen / 260));
+    trainGo.setAttribute('dur', dt.toFixed(2) + 's');
+    planeGo.setAttribute('dur', dp.toFixed(2) + 's');
+    var t = 300;
+    at(t, function () { stamps[0].classList.add('stamped'); });                     // 1. Hefei
+    t += 650;
+    at(t, function () { train.classList.add('moving'); try { trainGo.beginElement(); } catch (e) {} });   // 2. train to Beijing
+    t += dt * 1000;
+    at(t, function () { stamps[1].classList.add('stamped'); });                     // 3. Beijing
+    at(t + 250, function () { train.classList.remove('moving'); });
+    t += 650;
+    at(t, function () { plane.classList.add('moving'); try { planeGo.beginElement(); } catch (e) {} });   // 4. fly to Cambridge
+    t += dp * 1000;
+    at(t, function () { stamps[2].classList.add('stamped'); });                     // 5. Cambridge
+    at(t + 250, function () { plane.classList.remove('moving'); });
+  }
   function layout() {
+    if (order[cur] && order[cur].getAttribute('data-id') !== 'hello') hideMag();
     order.forEach(function (c, i) {
       var depth = i - cur;
       if (depth < 0) {
@@ -51,6 +138,11 @@
       c.setAttribute('aria-hidden', top ? 'false' : 'true');
     });
     updateProgress();
+    var topId = order[cur] ? order[cur].getAttribute('data-id') : null;
+    if (topId !== lastTopId) {
+      lastTopId = topId;
+      if (topId === 'education') setTimeout(flyJourney, 60);
+    }
   }
 
   function swing(c) {
@@ -107,7 +199,7 @@
     busy = true;
     var step = function () {
       var moved = target > cur ? next('down') : prev();
-      if (moved && cur !== target) setTimeout(step, 110);
+      if (moved && cur !== target) setTimeout(step, 85);
       else setTimeout(function () { busy = false; }, 500);
     };
     step();
@@ -123,9 +215,9 @@
     order.forEach(function (c, i) {
       var b = document.createElement('button');
       b.type = 'button';
-      b.setAttribute('aria-label', (i + 1) + '. ' + (c.getAttribute('data-title') || ''));
-      b.appendChild(document.createElement('span'));
-      b.addEventListener('click', function () { goTo(i); });
+      b.setAttribute('role', 'listitem');
+      b.textContent = c.getAttribute('data-nav') || c.getAttribute('data-title') || '';
+      b.addEventListener('click', function () { goTo(order.indexOf(c)); });
       ticks.appendChild(b);
     });
   }
@@ -133,12 +225,33 @@
   function updateProgress() {
     Array.prototype.forEach.call(ticks.children, function (b, i) {
       b.classList.toggle('on', i === cur);
-      if (i === cur) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      if (i === cur) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
     });
+    // keep the current label in view when the row scrolls (phones)
+    var on = ticks.children[cur];
+    if (on && ticks.scrollWidth > ticks.clientWidth) {
+      ticks.scrollTo({ left: on.offsetLeft - (ticks.clientWidth - on.offsetWidth) / 2, behavior: reduce ? 'auto' : 'smooth' });
+    }
     if (count) count.textContent = pad(cur + 1) + ' / ' + pad(order.length);
     if (prevBtn) prevBtn.disabled = cur === 0;
     if (nextBtn) nextBtn.disabled = cur === order.length - 1;
+    syncURL();
   }
+
+  /* The address keeps the current card and reader, so the language switch lands on the same card */
+  var langLink = document.querySelector('.lang-toggle');
+  var langBase = langLink ? langLink.getAttribute('href').split(/[?#]/)[0] : null;
+  function stateSuffix() {
+    var top = order[cur];
+    var q = (typeof current !== 'undefined' && current) ? '?for=' + encodeURIComponent(current) : '';
+    return q + (top ? '#' + top.getAttribute('data-id') : '');
+  }
+  function syncURL() {
+    var suffix = stateSuffix();
+    try { history.replaceState(null, '', location.pathname + suffix); } catch (e) {}
+    if (langLink && langBase) langLink.setAttribute('href', langBase + suffix);
+  }
+
   if (prevBtn) prevBtn.addEventListener('click', function () { if (!busy) prev(); });
   if (nextBtn) nextBtn.addEventListener('click', function () { if (!busy) next('down'); });
 
@@ -314,14 +427,26 @@
   var firstFlow = cards.indexOf(flowCards[0]);
   var lastFlow = cards.indexOf(flowCards[flowCards.length - 1]);
 
-  /* Each card gets a title face, shown while the deck is being shuffled */
+  /* Each card gets a playing-card face and a plain patterned back, shown while the deck is being shuffled */
   cards.forEach(function (c) {
     var tag = document.createElement('div');
     tag.className = 'card-tag';
     tag.setAttribute('aria-hidden', 'true');
-    tag.textContent = c.getAttribute('data-title') || '';
+    tag.innerHTML =
+      '<div class="face">' +
+        '<span class="corner tl"><b></b><i>\u25C6</i></span>' +
+        '<span class="t"></span><span class="orn"></span>' +
+        '<span class="corner br"><b></b><i>\u25C6</i></span>' +
+      '</div>' +
+      '<div class="back"></div>';
+    tag.querySelector('.t').textContent = c.getAttribute('data-nav') || c.getAttribute('data-title') || '';
     c.querySelector('.sway').appendChild(tag);
   });
+  function numberTags(list) {
+    list.forEach(function (c, i) {
+      Array.prototype.forEach.call(c.querySelectorAll('.card-tag .corner b'), function (el) { el.textContent = pad(i + 1); });
+    });
+  }
 
   function newOrderFor(seq) {
     var before = order.slice(0, firstFlow);
@@ -360,6 +485,7 @@
         c.style.transform = T(off * step, cy + Math.abs(off) * 8, off * 3.2);
       });
     };
+    numberTags(order);
     deck.classList.add('shuffling');
     top.style.transform = 'translate(-50%, -2%) scale(0.96)';
     top.style.opacity = '0.18';
@@ -370,8 +496,9 @@
     });
     // 1. fan out in the current order
     spread(rest, false);
-    // 2. gather into one pile
+    // 2. gather into one pile, face down
     setTimeout(function () {
+      deck.classList.add('backs');
       rest.forEach(function (c) {
         c.style.transitionDelay = '0ms';
         c.style.zIndex = String(300 + Math.floor(Math.random() * 20));
@@ -394,12 +521,12 @@
       });
     }, 1460);
     // 5. deal out in the new order
-    setTimeout(function () { spread(restNew, true); }, 1950);
+    setTimeout(function () { numberTags(nextOrder); deck.classList.remove('backs'); spread(restNew, true); }, 1950);
     // 6. hang the deck back up behind the current card
     setTimeout(function () {
       cards.forEach(function (c) { c.style.transitionDelay = '0ms'; });
       order = nextOrder;
-      deck.classList.remove('shuffling');
+      deck.classList.remove('shuffling', 'backs');
       top.style.opacity = '';
       buildTicks();
       layout();
@@ -407,10 +534,7 @@
     }, 3200);
   }
 
-  function apply(aud) {
-    if (busy) return;
-    current = aud;
-    var seq = orders[aud || 'none'];
+  function setChoice(aud) {
     var chosen = null;
     options.querySelectorAll('button').forEach(function (b) {
       var on = b.getAttribute('data-aud') === aud;
@@ -418,12 +542,17 @@
       if (on) chosen = b;
     });
     options.classList.toggle('chosen', !!aud);
-    options.classList.remove('riffle'); void options.offsetWidth; options.classList.add('riffle');
     blank.textContent = chosen ? chosen.getAttribute('data-fill') : ' ';
     blank.classList.toggle('filled', !!chosen);
     note.textContent = chosen ? note.getAttribute('data-chosen') : note.getAttribute('data-default');
     note.classList.toggle('on', !!chosen);
-    shuffleDeck(seq, function () {});
+  }
+  function apply(aud) {
+    if (busy) return;
+    current = aud;
+    setChoice(aud);
+    options.classList.remove('riffle'); void options.offsetWidth; options.classList.add('riffle');
+    shuffleDeck(orders[aud || 'none'], function () {});
   }
   if (options) {
     options.addEventListener('click', function (e) {
@@ -557,42 +686,107 @@
     });
   }
 
-  /* ===== Gloss words dodge the pointer ===== */
+  /* ===== First card only: a magnifier the words keep running away from (the truth is hard to pin down) ===== */
   var intro = document.querySelector('.intro');
   if (intro) {
+    var introCard = intro.closest('.card');
+    var area = introCard.querySelector('.card-inner');
     var gwords = Array.prototype.slice.call(intro.querySelectorAll('.w, .ew'));
-    var dodge = function (x, y, radius) {
+    var LENS_X = 44 / 128, LENS_Y = 44.6 / 128;   // lens centre in the Noto drawing
+    var magSize = 100, charPx = 40;
+    var mag = document.createElement('div');
+    mag.className = 'magnifier';
+    mag.setAttribute('aria-hidden', 'true');
+    // Noto Emoji magnifying glass (Apache 2.0, see CREDITS.txt): the same drawing on every device
+    mag.innerHTML = '<img src="magnifier.svg" alt="" draggable="false">';
+    document.body.appendChild(mag);
+    var sizeMag = function () {
+      var h = intro.querySelector('.w .h');
+      charPx = h ? parseFloat(getComputedStyle(h).fontSize) || 40 : 40;
+      // the lens (inner diameter about half the drawing) holds one Chinese character with a little room
+      magSize = Math.round(charPx * 2.35);
+      mag.style.width = mag.style.height = magSize + 'px';
+    };
+    sizeMag();
+    window.addEventListener('resize', sizeMag);
+    var place = function (x, y) {
+      mag.style.transform = 'translate(' + (x - magSize * LENS_X) + 'px, ' + (y - magSize * LENS_Y) + 'px)';
+    };
+    var dodge = function (x, y) {
+      var radius = Math.max(90, charPx * 2.4), push = charPx * 1.7;
       gwords.forEach(function (w) {
         var r = w.getBoundingClientRect();
         var dx = r.left + r.width / 2 - x, dy = r.top + r.height / 2 - y;
-        var d = Math.hypot(dx, dy);
-        if (d < radius && d > 0) {
-          var f = (1 - d / radius) * 70;
+        var d = Math.hypot(dx, dy) || 0.01;
+        if (d < radius) {
+          var f = (1 - d / radius) * push;
           w.style.transform = 'translate(' + (dx / d * f) + 'px,' + (dy / d * f) + 'px)';
         } else w.style.transform = '';
       });
     };
     var settle = function () { gwords.forEach(function (w) { w.style.transform = ''; }); };
+    var show = function () { mag.classList.add('on'); };
+    hideMag = function () { mag.classList.remove('on'); settle(); };
     var settleTimer = null;
-    // Mouse: words run away from the cursor
-    intro.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse') dodge(e.clientX, e.clientY, 110); });
-    intro.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') settle(); });
-    // Finger: words run away as the finger sweeps across them, then drift back
-    var fingerDodge = function (e) {
-      if (e.pointerType === 'mouse') return;
-      dodge(e.clientX, e.clientY, 120);
+    // Mouse and pen: the cursor becomes the magnifier anywhere on the first card
+    area.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
+      if (!introCard.classList.contains('is-top')) { hideMag(); return; }
+      show(); place(e.clientX, e.clientY); dodge(e.clientX, e.clientY);
+    });
+    area.addEventListener('pointerleave', function (e) { if (e.pointerType !== 'touch') hideMag(); });
+    // Finger: the magnifier floats just above the fingertip so it is not hidden under it
+    var fingerMag = function (e) {
+      if (e.pointerType !== 'touch' || !introCard.classList.contains('is-top')) return;
+      var lx = e.clientX, ly = e.clientY - magSize * 0.75;
+      show(); place(lx, ly); dodge(lx, ly);
       clearTimeout(settleTimer);
-      settleTimer = setTimeout(settle, 700);
     };
-    intro.addEventListener('pointerdown', fingerDodge);
-    intro.addEventListener('pointermove', fingerDodge);
+    var fingerUp = function (e) {
+      if (e.pointerType !== 'touch') return;
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(hideMag, 500);
+    };
+    area.addEventListener('pointerdown', fingerMag);
+    area.addEventListener('pointermove', fingerMag);
+    area.addEventListener('pointerup', fingerUp);
+    area.addEventListener('pointercancel', fingerUp);
   }
 
-  /* Start */
+  /* Start: restore the reader (?for=) and the card (#id) from the address */
+  (function () {
+    var m = /[?&]for=([^&#]+)/.exec(location.search);
+    var aud = m ? decodeURIComponent(m[1]) : null;
+    if (aud && orders[aud] && options) {
+      current = aud;
+      setChoice(aud);
+      order = newOrderFor(orders[aud]);
+    }
+    var id = location.hash.replace('#', '');
+    if (id) {
+      var idx = -1;
+      order.forEach(function (c, i) { if (c.getAttribute('data-id') === id) idx = i; });
+      if (idx > 0) {
+        cur = idx;
+        for (var i = 0; i < idx; i++) { order[i]._fall = { x: 0, r: 0 }; order[i].classList.add('hidden'); }
+      }
+    }
+  })();
   buildTicks();
   cards.forEach(function (c) { c.style.transition = 'none'; });
   layout();
   void deck.offsetWidth;
   cards.forEach(function (c) { c.style.transition = ''; });
-  window.addEventListener('resize', function () { if (!busy) layout(); });
+  /* A changed #card in the address (a shared link, the back button) jumps to that card */
+  window.addEventListener('hashchange', function () {
+    var id = location.hash.replace('#', '');
+    order.forEach(function (c, i) { if (c.getAttribute('data-id') === id && i !== cur) goTo(i); });
+  });
+  window.addEventListener('resize', function () {
+    if (!busy) layout();
+    if (lastTopId === 'education') {
+      var map = deck.querySelector('.journey');
+      if (map) { clearTimeout(map._rt); map._rt = setTimeout(flyJourney, 200); }
+    }
+  });
 })();
