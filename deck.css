@@ -1,0 +1,177 @@
+/* ===== Hanging card deck (shared by index.html and zh.html) ===== */
+
+html, body { height: 100%; }
+body.deck-page { overflow: hidden; overscroll-behavior: none; }
+
+/* Fixed controls: language + theme on top, progress at the bottom */
+.deck-page .bar { position: fixed; top: 0; left: 0; right: 0; background: transparent; z-index: 50; }
+
+.progress {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 50;
+  display: flex; align-items: center; gap: 4px;
+  color: var(--muted); font-size: 12px;
+}
+.progress .step {
+  width: 36px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--muted); border-radius: 999px;
+}
+.progress .step:hover { color: var(--ink); opacity: 1; }
+.progress .step:disabled { opacity: 0.3; cursor: default; }
+.progress .step svg { width: 16px; height: 16px; display: block; }
+.ticks { display: flex; align-items: center; }
+.ticks button {
+  width: 14px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+}
+.ticks button span { display: block; width: 1px; height: 10px; background: var(--tick); transition: width 0.25s ease, background-color 0.25s ease; }
+.ticks button.on span { width: 16px; background: transparent; border: 1px solid var(--muted); }
+.ticks button:hover span { background: var(--muted); }
+.ticks button.on:hover span { background: transparent; }
+/* Floating hint with a confirm button */
+.deck-hint {
+  position: fixed; left: 0; right: 0; bottom: 160px; z-index: 60;
+  width: max-content; max-width: calc(100vw - 32px); margin: 0 auto;
+  display: flex; align-items: center; gap: 14px;
+  padding: 8px 8px 8px 18px; border-radius: 999px;
+  background: var(--paper); color: var(--ink);
+  box-shadow: 0 0 0 1px var(--line), 0 14px 32px -12px rgba(0, 0, 0, 0.35);
+  font-size: 14px; line-height: 1.35;
+  animation: hint-float 3.2s ease-in-out infinite;
+  transition: opacity 0.35s ease, visibility 0.35s;
+}
+.deck-hint button {
+  flex-shrink: 0; min-height: 36px; padding: 0 16px; border-radius: 999px;
+  background: var(--sage); color: var(--on-accent); font-size: 14px;
+}
+.deck-hint button:hover { opacity: 0.85; }
+.deck-hint:hover { animation-play-state: paused; }
+.deck-hint.off { opacity: 0; visibility: hidden; pointer-events: none; }
+@keyframes hint-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Shuffle: the real cards fan out, shuffle and deal back */
+.card-tag {
+  position: absolute; inset: 0; z-index: 4; border-radius: 3px;
+  background: var(--paper); color: var(--ink);
+  box-shadow: 0 0 0 1px var(--line);
+  display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 6%;
+  font-size: clamp(64px, 7vw, 92px); line-height: 1.1; letter-spacing: -0.02em;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+}
+.card-inner.sage + .card-tag { background: var(--sage); color: var(--on-accent); }
+.deck.shuffling .card-tag { opacity: 1; }
+.deck.shuffling .card.is-top .card-tag { opacity: 0; }
+.deck.shuffling .card { transition: transform 0.4s cubic-bezier(0.3, 0.7, 0.3, 1), opacity 0.3s ease; }
+.deck.shuffling .card.is-top { transition: transform 0.4s ease, opacity 0.3s ease; }
+
+/* The stage */
+.deck {
+  position: fixed; left: 0; right: 0; top: 64px; bottom: 88px;
+  max-width: none; margin: 0; padding: 0; display: block; gap: 0;
+}
+.card {
+  --hang: 34px;
+  position: absolute; left: 50%; top: var(--hang);
+  width: min(1080px, calc(100vw - 48px));
+  height: min(660px, calc(100% - var(--hang) - 12px));
+  transform-origin: 50% calc(var(--hang) * -1);
+  transition: transform 0.75s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
+  will-change: transform;
+}
+.card.falling { transition: transform 0.9s cubic-bezier(0.55, 0.05, 0.9, 0.45), opacity 0.3s ease-in 0.6s; }
+.card.hidden { visibility: hidden; }
+
+/* Punched hole near the top edge (no string) */
+.sway { position: absolute; inset: 0; transform-origin: 50% calc(var(--hang) * -1); }
+.sway::after {
+  content: ''; position: absolute; left: 50%; top: 6px; width: 9px; height: 9px; margin-left: -4px;
+  border-radius: 50%; background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); z-index: 3;
+}
+.card.swing .sway { animation: card-swing 1.3s cubic-bezier(0.3, 0.6, 0.4, 1); }
+@keyframes card-swing {
+  0% { transform: rotate(2.4deg); }
+  30% { transform: rotate(-1.6deg); }
+  55% { transform: rotate(0.9deg); }
+  78% { transform: rotate(-0.4deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.card-inner {
+  position: absolute; inset: 0;
+  background: var(--paper); color: var(--ink);
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--line), 0 22px 44px -28px rgba(0, 0, 0, 0.45);
+  padding: clamp(28px, 4.4vw, 56px) clamp(20px, 4.4vw, 60px) clamp(24px, 3.6vw, 48px);
+  overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
+  scrollbar-width: thin;
+  display: flex; flex-direction: column; justify-content: safe center;
+}
+.card-inner > section { width: 100%; }
+.card-inner.sage { background: var(--sage); color: var(--on-accent); }
+
+/* Section tweaks inside cards */
+.card .cloze { border-top: 0; padding-top: 0; }
+.card .now { background: transparent; padding: 0; }
+.card .foot-in { font-size: 13px; color: var(--on-accent); opacity: 0.7; margin-top: 8px; }
+.card .photos { display: flex; flex-direction: column; gap: 12px; }
+.card .photos .strip { padding: 0; scroll-padding-inline: 0; }
+.card .photos .strip img { height: clamp(170px, 42vh, 420px); }
+.card .talks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 48px; }
+.card .projects-body { display: flex; flex-direction: column; gap: 18px; max-width: 34em; }
+.card .projects-body .lead { font-size: clamp(22px, 3vw, 36px); line-height: 1.2; letter-spacing: -0.015em; }
+
+/* Fill in the blank: option cards and the shuffling mini deck */
+.card .options { flex-direction: row; flex-wrap: wrap; gap: 10px 12px; }
+.card .options button {
+  padding: 10px 16px; border-radius: 3px;
+  background: var(--bg); box-shadow: 0 0 0 1px var(--line), 0 6px 14px -10px rgba(0, 0, 0, 0.35);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, color 0.3s ease;
+}
+.card .options button:nth-child(odd) { transform: rotate(-1.4deg); }
+.card .options button:nth-child(even) { transform: rotate(1.1deg); }
+.card .options button:hover { transform: translateY(-4px) rotate(0deg); opacity: 1; }
+.card .options button[aria-pressed="true"] { background: var(--sage); color: var(--on-accent); transform: translateY(-6px) rotate(0deg); }
+.card .options button[aria-pressed="true"] .en { text-decoration: none; }
+.card .options.riffle button { animation: opt-riffle 0.6s cubic-bezier(0.3, 0.7, 0.4, 1); }
+.card .options.riffle button:nth-child(2) { animation-delay: 40ms; }
+.card .options.riffle button:nth-child(3) { animation-delay: 80ms; }
+.card .options.riffle button:nth-child(4) { animation-delay: 120ms; }
+.card .options.riffle button:nth-child(5) { animation-delay: 160ms; }
+@keyframes opt-riffle {
+  0% { translate: 0 0; }
+  35% { translate: 0 -10px; }
+  60% { translate: 0 3px; }
+  100% { translate: 0 0; }
+}
+
+/* Phones */
+@media (max-width: 640px) {
+  .deck { top: 56px; bottom: 80px; }
+  .card { --hang: 26px; width: calc(100vw - 24px); }
+  .card-inner { padding: 26px 18px 22px; justify-content: flex-start; }
+  .card .talks { grid-template-columns: 1fr; gap: 14px; }
+  .card .photos .strip img { height: clamp(150px, 34vh, 260px); }
+  .progress { bottom: 12px; }
+  .deck-hint { bottom: 132px; font-size: 13px; padding-left: 14px; gap: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .card.falling { transition: none !important; }
+  .card.swing .sway, .deck-hint { animation: none !important; }
+}
+
+/* Education: dots line up with the text */
+.card .edu-dot { margin: 0; }
+.card .dots, .card .gloss { touch-action: none; }
+
+/* Touch screens */
+@media (max-width: 640px) {
+  .card .edu-map { padding-left: 26px; gap: 22px; }
+  .card .edu-map::after { content: ''; position: absolute; left: 6px; top: 10px; bottom: 10px; border-left: 2px dashed var(--sage-deep); opacity: 0.5; }
+  .card .edu-node { position: relative; }
+  .card .edu-dot { position: absolute; left: -26px; top: 2px; }
+  .card .label.title { font-size: 16px; }
+  .card .options button { padding: 9px 13px; font-size: 15px; }
+  .card .quote { padding: 10px 0; justify-content: flex-start; }
+}
